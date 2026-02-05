@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taste That Wine</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Taste That Wine</h1>
+      <p class="subtitle">Run a tasting session and score wines from 1 to 5.</p>
+    </header>
+
+    <section class="card">
+      <h2>1) Session</h2>
+      <label>
+        Session name
+        <input id="sessionName" type="text" placeholder="Friday blind tasting" />
+      </label>
+      <label>
+        Participant name
+        <input id="participantName" type="text" placeholder="Alice" />
+      </label>
+      <button id="saveSessionBtn" type="button">Save session</button>
+      <p id="sessionStatus" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>2) Add wine</h2>
+      <label>
+        Bottle photo
+        <input id="bottlePhoto" type="file" accept="image/*" capture="environment" />
+      </label>
+      <button id="lookupBtn" type="button">Try auto-fill from photo</button>
+
+      <div class="grid-two">
+        <label>Wine name <input id="wineName" type="text" placeholder="Chablis Premier Cru" /></label>
+        <label>Winery <input id="winery" type="text" placeholder="Domaine Example" /></label>
+        <label>Vintage <input id="vintage" type="text" placeholder="2021" /></label>
+        <label>Country <input id="country" type="text" placeholder="France" /></label>
+      </div>
+
+      <button id="addWineBtn" type="button">Add wine to session</button>
+      <p id="wineStatus" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>3) Rate a wine</h2>
+      <label>
+        Select wine
+        <select id="wineSelect">
+          <option value="">No wine yet</option>
+        </select>
+      </label>
+      <label>
+        Note (1 to 5)
+        <input id="score" type="number" min="1" max="5" value="3" />
+      </label>
+      <button id="submitRatingBtn" type="button">Submit rating</button>
+      <p id="ratingStatus" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>Current session wines</h2>
+      <ul id="wineList" class="wine-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
