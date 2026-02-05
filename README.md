@@ -4,12 +4,12 @@ A mobile-first web app for wine tasting sessions.
 
 ## What is implemented
 
-- 📷 Bottle photo capture from mobile camera.
-- 🔎 Auto-fill attempt from photo via `POST /api/wines/lookup`.
-- ✍️ Manual wine entry fallback (name, winery, vintage, country).
-- 👥 Session + participant setup.
-- ⭐ Rating from 1 to 5 for each selected wine.
-- 🗃️ Backend endpoints ready to persist sessions/ratings in Airtable.
+- Bottle photo capture from mobile camera.
+- Auto-fill attempt from photo via `POST /api/wines/lookup`.
+- Manual wine entry fallback (name, winery, vintage, country).
+- Session + participant setup.
+- Rating from 1 to 5 for each selected wine.
+- Backend endpoints ready to persist sessions/ratings in Airtable.
 
 ## Project structure
 
@@ -18,7 +18,7 @@ A mobile-first web app for wine tasting sessions.
 
 ## Do you need a backend?
 
-Yes—**recommended** for real usage.
+Yes - **recommended** for real usage.
 
 You can host frontend directly from GitHub Pages, but backend is needed to:
 - keep Airtable and lookup API keys private,
