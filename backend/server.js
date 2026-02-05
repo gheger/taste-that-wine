@@ -1,12 +1,22 @@
 import express from "express";
 import cors from "cors";
 import multer from "multer";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, "..");
 
 const app = express();
 const upload = multer();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(new URL("..", import.meta.url).pathname));
+app.use(express.static(projectRoot));
+
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(projectRoot, "index.html"));
+});
 
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
