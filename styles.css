@@ -1,0 +1,97 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f4ef;
+  --card: #ffffff;
+  --accent: #6f1d1b;
+  --text: #2b2b2b;
+  --border: #e6ddd1;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+header h1 {
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  margin-top: 0;
+  color: #5f5f5f;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid #ccbfae;
+  padding: 0.55rem 0.7rem;
+  font-size: 1rem;
+}
+
+button {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+button:hover {
+  opacity: 0.95;
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.status {
+  min-height: 1.2rem;
+  margin: 0;
+  color: #515151;
+  font-size: 0.9rem;
+}
+
+.wine-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+@media (min-width: 640px) {
+  .grid-two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
