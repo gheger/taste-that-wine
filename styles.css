@@ -1,21 +1,105 @@
 :root {
   color-scheme: light;
-  --bg: #f7f4ef;
+  --bg: #f3efe8;
   --card: #ffffff;
   --accent: #6f1d1b;
-  --text: #2b2b2b;
-  --border: #e6ddd1;
+  --accent-soft: #b46a4a;
+  --text: #2c2622;
+  --border: #e0d2c2;
+  --shadow: 0 14px 32px rgba(51, 30, 19, 0.12);
 }
 
 * {
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: radial-gradient(circle at top, #fef9f1 0%, #f4efe5 40%, #efe7da 100%);
   color: var(--text);
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 252, 246, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+.brand h1 {
+  margin: 0 0 0.2rem;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  color: #5f5f5f;
+}
+
+.menu-toggle {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff8f0;
+  display: grid;
+  place-items: center;
+  gap: 5px;
+  padding: 0;
+}
+
+.menu-line {
+  width: 22px;
+  height: 2px;
+  background: var(--accent);
+  display: block;
+  border-radius: 99px;
+}
+
+.drawer {
+  display: none;
+  padding: 0.5rem 1rem 1rem;
+  gap: 0.6rem;
+  background: #fffaf3;
+  border-bottom: 1px solid var(--border);
+}
+
+.drawer-link {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.drawer-link.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.drawer-open .drawer {
+  display: grid;
 }
 
 .app {
@@ -23,25 +107,32 @@ body {
   margin: 0 auto;
   padding: 1rem;
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
 }
 
-header h1 {
-  margin-bottom: 0.2rem;
+.section {
+  display: none;
+  animation: fadeIn 0.35s ease;
 }
 
-.subtitle {
-  margin-top: 0;
-  color: #5f5f5f;
+.section.active {
+  display: grid;
+  gap: 1rem;
 }
 
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1rem;
   display: grid;
   gap: 0.6rem;
+  box-shadow: var(--shadow);
+  animation: rise 0.45s ease;
+}
+
+.card:nth-child(2) {
+  animation-delay: 0.08s;
 }
 
 label {
@@ -52,13 +143,19 @@ label {
 
 input,
 select,
+textarea,
 button {
   width: 100%;
   min-height: 42px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #ccbfae;
   padding: 0.55rem 0.7rem;
   font-size: 1rem;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
 }
 
 button {
@@ -78,6 +175,12 @@ button:hover {
   gap: 0.55rem;
 }
 
+.helper {
+  margin: 0;
+  color: #6b5b4c;
+  font-size: 0.85rem;
+}
+
 .status {
   min-height: 1.2rem;
   margin: 0;
@@ -90,8 +193,90 @@ button:hover {
   padding-left: 1.1rem;
 }
 
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.wine-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.wine-table th,
+.wine-table td {
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.wine-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wine-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: #f6efe6;
+}
+
+.taste-mark {
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.wine-table tbody tr.untasted {
+  opacity: 0.85;
+}
+
+.wine-table tbody tr.untasted .taste-mark {
+  color: #8c7b6b;
+}
+
+.wine-table tbody tr {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.wine-table tbody tr:hover {
+  background: rgba(111, 29, 27, 0.08);
+}
+
+.wine-table tbody tr.active {
+  background: rgba(111, 29, 27, 0.18);
+}
+
 @media (min-width: 640px) {
   .grid-two {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

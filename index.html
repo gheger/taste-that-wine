@@ -7,66 +7,88 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="app">
-    <header>
-      <h1>Taste That Wine</h1>
-      <p class="subtitle">Run a tasting session and score wines from 1 to 5.</p>
+  <div class="app-shell">
+    <header class="topbar">
+      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Open menu">
+        <span class="menu-line"></span>
+        <span class="menu-line"></span>
+        <span class="menu-line"></span>
+      </button>
+      <div class="brand">
+        <h1>Taste That Wine</h1>
+        <p class="subtitle">Capture bottles, add tasting notes, and score wines.</p>
+      </div>
     </header>
 
-    <section class="card">
-      <h2>1) Session</h2>
-      <label>
-        Session name
-        <input id="sessionName" type="text" placeholder="Friday blind tasting" />
-      </label>
-      <label>
-        Participant name
-        <input id="participantName" type="text" placeholder="Alice" />
-      </label>
-      <button id="saveSessionBtn" type="button">Save session</button>
-      <p id="sessionStatus" class="status"></p>
-    </section>
+    <nav id="drawer" class="drawer" aria-label="Main menu">
+      <button class="drawer-link active" type="button" data-nav="wine">Wine</button>
+      <button class="drawer-link" type="button" data-nav="notes">Tasting notes</button>
+    </nav>
 
-    <section class="card">
-      <h2>2) Add wine</h2>
-      <label>
-        Bottle photo
-        <input id="bottlePhoto" type="file" accept="image/*" capture="environment" />
-      </label>
-      <button id="lookupBtn" type="button">Try auto-fill from photo</button>
+    <main class="app">
+      <section id="section-wine" class="section active" data-section="wine">
+        <div class="card">
+          <h2>Wine</h2>
+          <label>
+            Bottle photo
+            <input id="bottlePhoto" type="file" accept="image/*" capture="environment" />
+          </label>
+          <p class="helper">Photo will be saved as base64 in Airtable for this wine.</p>
+          <button id="lookupBtn" type="button">Try auto-fill from photo</button>
 
-      <div class="grid-two">
-        <label>Wine name <input id="wineName" type="text" placeholder="Chablis Premier Cru" /></label>
-        <label>Winery <input id="winery" type="text" placeholder="Domaine Example" /></label>
-        <label>Vintage <input id="vintage" type="text" placeholder="2021" /></label>
-        <label>Country <input id="country" type="text" placeholder="France" /></label>
-      </div>
+          <div class="grid-two">
+            <label>Wine name <input id="wineName" type="text" placeholder="Chablis Premier Cru" /></label>
+            <label>Winery <input id="winery" type="text" placeholder="Domaine Example" /></label>
+            <label>Vintage <input id="vintage" type="text" placeholder="2021" /></label>
+            <label>Country <input id="country" type="text" placeholder="France" /></label>
+          </div>
 
-      <button id="addWineBtn" type="button">Add wine to session</button>
-      <p id="wineStatus" class="status"></p>
-    </section>
+          <button id="addWineBtn" type="button">Add wine</button>
+          <p id="wineStatus" class="status"></p>
+        </div>
+      </section>
 
-    <section class="card">
-      <h2>3) Rate a wine</h2>
-      <label>
-        Select wine
-        <select id="wineSelect">
-          <option value="">No wine yet</option>
-        </select>
-      </label>
-      <label>
-        Note (1 to 5)
-        <input id="score" type="number" min="1" max="5" value="3" />
-      </label>
-      <button id="submitRatingBtn" type="button">Submit rating</button>
-      <p id="ratingStatus" class="status"></p>
-    </section>
+      <section id="section-notes" class="section" data-section="notes">
+        <div class="card">
+          <h2>Tasting notes</h2>
+          <label>
+            Select wine
+            <select id="wineSelect">
+              <option value="">No wine yet</option>
+            </select>
+          </label>
+          <label>
+            Score (1 to 5)
+            <input id="score" type="number" min="1" max="5" value="3" />
+          </label>
+          <label>
+            Notes
+            <textarea id="notes" rows="4" placeholder="Aromas, palate, finish, pairing ideas..."></textarea>
+          </label>
+          <button id="submitRatingBtn" type="button">Save tasting notes</button>
+          <p id="ratingStatus" class="status"></p>
+        </div>
 
-    <section class="card">
-      <h2>Current session wines</h2>
-      <ul id="wineList" class="wine-list"></ul>
-    </section>
-  </main>
+        <div class="card">
+          <h3>Current wines</h3>
+          <div class="table-wrap">
+            <table class="wine-table">
+              <thead>
+                <tr>
+                  <th>Wine</th>
+                  <th>Winery</th>
+                  <th>Vintage</th>
+                  <th>Country</th>
+                  <th>Tasted</th>
+                </tr>
+              </thead>
+              <tbody id="wineTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script src="app.js" defer></script>
 </body>
