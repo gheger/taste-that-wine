@@ -23,6 +23,7 @@
     <nav id="drawer" class="drawer" aria-label="Main menu">
       <button class="drawer-link active" type="button" data-nav="wine">Ajouter un vin</button>
       <button class="drawer-link" type="button" data-nav="notes">Notes de dégustation</button>
+      <button class="drawer-link" type="button" data-nav="leaderboard">Classement</button>
       <button id="resetSessionBtn" class="drawer-link reset-link" type="button">Nouvelle session</button>
     </nav>
 
@@ -88,14 +89,24 @@
           </div>
         </div>
 
+        <button id="toLeaderboardBtn" class="section-cta" type="button">Voir le classement</button>
+
         <div class="card" id="notesCard">
           <h2>Notes de dégustation</h2>
-          <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+          <div id="selectedWineInfo" class="selected-wine-info">
+            <div class="selected-wine-meta">
+              <p id="selectedWineName" class="selected-wine-name"></p>
+              <p id="selectedWineWinery" class="selected-wine-detail"></p>
+              <p id="selectedWineVintage" class="selected-wine-detail"></p>
+              <p id="selectedWineCountry" class="selected-wine-detail"></p>
+            </div>
+            <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+          </div>
           <label>
             <div class="score-header">
               <span>Score (bouge le slider)</span>
-              <span id="averageScore" class="average-score">Moyenne : --</span>
               <span id="scoreLabel" class="score-label"></span>
+              <span id="averageScore" class="average-score">Moyenne : --</span>
             </div>
             <div class="score-row">
               <input id="score" type="range" min="10" max="100" step="10" value="50" />
@@ -106,8 +117,36 @@
             Notes
             <textarea id="notes" rows="4" placeholder="Arômes, bouche, finale, idées d’accords..."></textarea>
           </label>
-          <button id="submitRatingBtn" type="button">Enregistrer les notes de dégustation</button>
           <p id="ratingStatus" class="status"></p>
+        </div>
+      </section>
+
+      <section id="section-leaderboard" class="section" data-section="leaderboard">
+        <div class="card">
+          <div class="leaderboard-header">
+            <h2>Classement</h2>
+            <button id="refreshLeaderboardBtn" type="button">Rafraîchir</button>
+          </div>
+          <div class="table-wrap">
+            <table class="wine-table">
+              <colgroup>
+                <col style="width: 50%" />
+                <col style="width: 20%" />
+                <col style="width: 15%" />
+                <col style="width: 15%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Vin</th>
+                  <th>Domaine</th>
+                  <th>Moyenne</th>
+                  <th>Votes</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody"></tbody>
+            </table>
+          </div>
+          <p id="leaderboardStatus" class="status"></p>
         </div>
       </section>
     </main>
@@ -119,6 +158,23 @@
   <div id="imageLightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Aperçu de l'image">
     <button id="lightboxClose" class="lightbox-close" type="button" aria-label="Fermer l'image">Fermer</button>
     <img id="lightboxImage" class="lightbox-image" alt="Aperçu du vin" />
+  </div>
+
+  <div id="leaderboardModal" class="modal" aria-hidden="true" role="dialog" aria-label="Détails du vin">
+    <div class="modal-card">
+      <button id="leaderboardModalClose" class="modal-close" type="button" aria-label="Fermer">Fermer</button>
+      <div class="selected-wine-info modal-info">
+        <div class="selected-wine-meta">
+          <p id="modalWineName" class="selected-wine-name"></p>
+          <p id="modalWineWinery" class="selected-wine-detail"></p>
+          <p id="modalWineVintage" class="selected-wine-detail"></p>
+          <p id="modalWineCountry" class="selected-wine-detail"></p>
+          <p id="modalWineAverage" class="selected-wine-detail"></p>
+          <p id="modalWineVotes" class="selected-wine-detail"></p>
+        </div>
+        <img id="modalWineImage" class="selected-wine-photo" alt="Photo du vin" />
+      </div>
+    </div>
   </div>
 
   <script src="app.js" defer></script>
