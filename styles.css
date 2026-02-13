@@ -208,13 +208,7 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-runnable-track {
   height: 12px;
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--accent) 0%,
-    var(--accent) var(--range-fill, 50%),
-    #e8ddcf var(--range-fill, 50%),
-    #e8ddcf 100%
-  );
+  background: linear-gradient(90deg, #c0392b 0%, #f1c40f 50%, #27ae60 100%);
   border: 1px solid var(--border);
 }
 
@@ -232,13 +226,7 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-track {
   height: 12px;
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--accent) 0%,
-    var(--accent) var(--range-fill, 50%),
-    #e8ddcf var(--range-fill, 50%),
-    #e8ddcf 100%
-  );
+  background: linear-gradient(90deg, #c0392b 0%, #f1c40f 50%, #27ae60 100%);
   border: 1px solid var(--border);
 }
 
@@ -258,9 +246,15 @@ input[type="range"]:focus-visible {
 
 .score-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   gap: 0.6rem;
   align-items: center;
+}
+
+.score-track {
+  position: relative;
+  width: 100%;
+  padding-top: 1.8rem;
 }
 
 .score-header {
@@ -290,14 +284,32 @@ input[type="range"]:focus-visible {
   border: 1px solid var(--border);
 }
 
-.score-value {
-  min-width: 3ch;
+.score-bubble {
+  position: absolute;
+  top: 0;
+  left: var(--bubble-x, 50%);
+  transform: translateX(-50%);
+  min-width: 3.5ch;
   padding: 0.35rem 0.6rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #fff8f0;
+  border-radius: 14px;
+  background: var(--score-color, var(--accent));
+  color: #fff;
   font-weight: 700;
   text-align: center;
+  box-shadow: 0 6px 16px rgba(51, 30, 19, 0.22);
+}
+
+.score-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--score-color, var(--accent));
 }
 
 .score-label {
@@ -313,7 +325,7 @@ input[type="range"]:focus-visible {
 }
 
 textarea {
-  min-height: 120px;
+  min-height: 72px;
   resize: vertical;
 }
 
@@ -367,7 +379,6 @@ button:hover {
 .wine-table th,
 .wine-table td {
   padding: 0.65rem 0.5rem;
-  border-bottom: 1px solid var(--border);
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -375,16 +386,26 @@ button:hover {
   word-break: keep-all;
   overflow-wrap: normal;
   hyphens: none;
+  max-width: none;
+  min-width: 0;
+  vertical-align: middle;
+  background-clip: padding-box;
+}
+
+.wine-table tbody tr {
+  border-bottom: 1px solid var(--border);
 }
 
 .wine-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: block;
   min-width: 0;
+  width: 100%;
 }
 
 .wine-cell span {
+  display: block;
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -534,8 +555,36 @@ button:hover {
 
 .modal-info {
   margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.8rem;
+  align-items: start;
 }
 
+.modal-info .selected-wine-photo {
+  width: 180px;
+  height: 240px;
+  max-height: 240px;
+  margin: 0;
+}
+
+.modal-notes {
+  width: 100%;
+  max-width: 100%;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 600px) {
+  .modal-info {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-info .selected-wine-photo {
+    width: 100%;
+    height: auto;
+    max-height: 240px;
+  }
+}
 .modal-action {
   width: auto;
   margin-top: 0.6rem;
@@ -546,6 +595,18 @@ button:hover {
   color: var(--accent);
   font-weight: 600;
   text-align: left;
+}
+
+.vivino-link {
+  display: inline-block;
+  margin-top: 0.4rem;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.vivino-link:hover {
+  opacity: 0.85;
 }
 
 .modal-notes {

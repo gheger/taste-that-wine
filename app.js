@@ -9,6 +9,49 @@ const state = {
 
 const API_BASE = window.API_BASE || "";
 
+const normalizeCountry = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+const countryFlags = {
+  france: "🇫🇷",
+  italie: "🇮🇹",
+  italy: "🇮🇹",
+  espagne: "🇪🇸",
+  spain: "🇪🇸",
+  portugal: "🇵🇹",
+  suisse: "🇨🇭",
+  switzerland: "🇨🇭",
+  "etats-unis": "🇺🇸",
+  "etats unis": "🇺🇸",
+  "etatsunis": "🇺🇸",
+  "etats-unis d'amerique": "🇺🇸",
+  "etats-unis d amerique": "🇺🇸",
+  "etats unis d amerique": "🇺🇸",
+  "united states": "🇺🇸",
+  usa: "🇺🇸",
+  argentine: "🇦🇷",
+  argentina: "🇦🇷",
+  chili: "🇨🇱",
+  chile: "🇨🇱",
+  australie: "🇦🇺",
+  australia: "🇦🇺",
+  "nouvelle-zelande": "🇳🇿",
+  "nouvelle zelande": "🇳🇿",
+  "new zealand": "🇳🇿",
+  allemagne: "🇩🇪",
+  germany: "🇩🇪",
+  autriche: "🇦🇹",
+  austria: "🇦🇹",
+  "afrique du sud": "🇿🇦",
+  "south africa": "🇿🇦",
+  grece: "🇬🇷",
+  greece: "🇬🇷",
+};
+
 const el = {
   menuToggle: document.getElementById("menuToggle"),
   drawer: document.getElementById("drawer"),
@@ -37,6 +80,7 @@ const el = {
   selectedWineWinery: document.getElementById("selectedWineWinery"),
   selectedWineVintage: document.getElementById("selectedWineVintage"),
   selectedWineCountry: document.getElementById("selectedWineCountry"),
+  selectedWineVivinoLink: document.getElementById("selectedWineVivinoLink"),
   participantName: document.getElementById("participantName"),
   sessionCode: document.getElementById("sessionCode"),
   joinSessionBtn: document.getElementById("joinSessionBtn"),
@@ -62,6 +106,7 @@ const el = {
   modalWineVotes: document.getElementById("modalWineVotes"),
   modalWineImage: document.getElementById("modalWineImage"),
   modalOpenNotesBtn: document.getElementById("modalOpenNotesBtn"),
+  modalVivinoLink: document.getElementById("modalVivinoLink"),
   modalNotesList: document.getElementById("modalNotesList"),
 };
 
@@ -94,15 +139,30 @@ function updateSelectedWineImage() {
         : "Millésime : N/D";
     }
     if (el.selectedWineCountry) {
-      el.selectedWineCountry.textContent = wine.country
-        ? `Pays : ${wine.country}`
-        : "Pays : N/D";
+      const country = wine.country || "";
+      const flag = countryFlags[normalizeCountry(country)] || "";
+      if (flag && country) {
+        el.selectedWineCountry.textContent = `Pays : ${flag} ${country}`;
+      } else if (flag) {
+        el.selectedWineCountry.textContent = `Pays : ${flag}`;
+      } else if (country) {
+        el.selectedWineCountry.textContent = `Pays : ${country}`;
+      } else {
+        el.selectedWineCountry.textContent = "Pays : N/D";
+      }
+    }
+    if (el.selectedWineVivinoLink) {
+      const query = `${wine.name || ""} ${wine.vintage || ""} ${wine.winery || ""}`.trim();
+      el.selectedWineVivinoLink.href = query
+        ? `https://www.vivino.com/search/wines?q=${encodeURIComponent(query)}`
+        : "#";
     }
   } else {
     if (el.selectedWineName) el.selectedWineName.textContent = "";
     if (el.selectedWineWinery) el.selectedWineWinery.textContent = "";
     if (el.selectedWineVintage) el.selectedWineVintage.textContent = "";
     if (el.selectedWineCountry) el.selectedWineCountry.textContent = "";
+    if (el.selectedWineVivinoLink) el.selectedWineVivinoLink.href = "#";
   }
 }
 
@@ -381,6 +441,12 @@ function openLeaderboardModal(entry) {
   if (el.modalOpenNotesBtn) {
     el.modalOpenNotesBtn.dataset.wineId = entry.id;
   }
+  if (el.modalVivinoLink) {
+    const query = `${entry.name || ""} ${entry.vintage || ""} ${entry.winery || ""}`.trim();
+    el.modalVivinoLink.href = query
+      ? `https://www.vivino.com/search/wines?q=${encodeURIComponent(query)}`
+      : "#";
+  }
   el.modalWineName.textContent = entry.name || "Vin inconnu";
   el.modalWineWinery.textContent = entry.winery ? `Domaine : ${entry.winery}` : "Domaine : N/D";
   el.modalWineVintage.textContent = entry.vintage
@@ -521,31 +587,13 @@ function render() {
       .filter(Boolean),
   );
 
-  const countryFlags = {
-    France: "🇫🇷",
-    Italy: "🇮🇹",
-    Spain: "🇪🇸",
-    Portugal: "🇵🇹",
-    Switzerland: "🇨🇭",
-    "United States": "🇺🇸",
-    USA: "🇺🇸",
-    Argentina: "🇦🇷",
-    Chile: "🇨🇱",
-    Australia: "🇦🇺",
-    "New Zealand": "🇳🇿",
-    Germany: "🇩🇪",
-    Austria: "🇦🇹",
-    "South Africa": "🇿🇦",
-    Greece: "🇬🇷",
-  };
-
   state.wines.forEach((wine) => {
     const row = document.createElement("tr");
     row.dataset.wineId = wine.id;
     const rowTasted = tastedSet.has(wine.id);
     const rowMark = rowTasted ? "✓" : "?";
     const country = wine.country || "";
-    const flag = countryFlags[country] || "";
+    const flag = countryFlags[normalizeCountry(country)] || "";
     const countryCell = flag ? `<span class="country-flag" title="${country}">${flag}</span>` : "N/D";
     row.classList.toggle("tasted", rowTasted);
     row.classList.toggle("untasted", !rowTasted);
@@ -751,6 +799,7 @@ el.selectedWineImage.addEventListener("click", () => {
   }
 });
 
+
 el.lightboxClose.addEventListener("click", closeLightbox);
 el.imageLightbox.addEventListener("click", (event) => {
   if (event.target === el.imageLightbox) {
@@ -772,6 +821,7 @@ el.modalOpenNotesBtn?.addEventListener("click", () => {
   setSelectedWine(wineId);
   setActiveSection("notes");
 });
+
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -797,8 +847,14 @@ function updateScoreDisplay() {
   el.scoreValue.textContent = String(value);
   if (el.scoreLabel) {
     el.scoreLabel.textContent = scoreLabels[value] || "";
+    el.scoreLabel.style.color = `hsl(${(percent * 120) / 100}, 65%, 35%)`;
   }
   el.score.style.setProperty("--range-fill", `${percent}%`);
+  const track = el.score.parentElement;
+  if (track) {
+    track.style.setProperty("--bubble-x", `${percent}%`);
+    track.style.setProperty("--score-color", `hsl(${(percent * 120) / 100}, 65%, 35%)`);
+  }
 }
 
 el.score.addEventListener("input", updateScoreDisplay);

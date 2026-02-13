@@ -96,26 +96,29 @@
           <div id="selectedWineInfo" class="selected-wine-info">
             <div class="selected-wine-meta">
               <p id="selectedWineName" class="selected-wine-name"></p>
-              <p id="selectedWineWinery" class="selected-wine-detail"></p>
-              <p id="selectedWineVintage" class="selected-wine-detail"></p>
-              <p id="selectedWineCountry" class="selected-wine-detail"></p>
-            </div>
-            <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+            <p id="selectedWineWinery" class="selected-wine-detail"></p>
+            <p id="selectedWineVintage" class="selected-wine-detail"></p>
+            <p id="selectedWineCountry" class="selected-wine-detail"></p>
+            <a id="selectedWineVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Chercher ce vin sur Vivino</a>
           </div>
+          <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+        </div>
           <label>
             <div class="score-header">
-              <span>Score (bouge le slider)</span>
+              <span>Score (déplace le curseur)</span>
               <span id="scoreLabel" class="score-label"></span>
               <span id="averageScore" class="average-score">Moyenne : --</span>
             </div>
             <div class="score-row">
-              <input id="score" type="range" min="10" max="100" step="10" value="50" />
-              <span id="scoreValue" class="score-value">50</span>
+              <div class="score-track">
+                <input id="score" type="range" min="10" max="100" step="10" value="50" />
+                <span id="scoreValue" class="score-bubble">50</span>
+              </div>
             </div>
           </label>
           <label>
             Notes
-            <textarea id="notes" rows="4" maxlength="200" placeholder="Arômes, bouche, finale, idées d’accords..."></textarea>
+            <textarea id="notes" rows="2" maxlength="200" placeholder="Arômes, bouche, finale, idées d’accords..."></textarea>
             <p id="notesCount" class="notes-count">0 / 200</p>
           </label>
           <p id="ratingStatus" class="status"></p>
@@ -165,6 +168,7 @@
       <div class="modal-card">
         <button id="leaderboardModalClose" class="modal-close" type="button" aria-label="Fermer">Fermer</button>
         <div class="selected-wine-info modal-info">
+          <img id="modalWineImage" class="selected-wine-photo" alt="Photo du vin" />
           <div class="selected-wine-meta">
             <p id="modalWineName" class="selected-wine-name"></p>
             <p id="modalWineWinery" class="selected-wine-detail"></p>
@@ -172,10 +176,10 @@
             <p id="modalWineCountry" class="selected-wine-detail"></p>
             <p id="modalWineAverage" class="selected-wine-detail"></p>
             <p id="modalWineVotes" class="selected-wine-detail"></p>
-            <button id="modalOpenNotesBtn" class="modal-action" type="button">Ouvrir dans Notes de dégustation</button>
-            <div id="modalNotesList" class="modal-notes"></div>
+            <a id="modalVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Chercher ce vin sur Vivino</a>
+            <button id="modalOpenNotesBtn" class="modal-action" type="button">Noter ce vin</button>
           </div>
-          <img id="modalWineImage" class="selected-wine-photo" alt="Photo du vin" />
+          <div id="modalNotesList" class="modal-notes"></div>
         </div>
       </div>
   </div>
