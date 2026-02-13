@@ -13,34 +13,67 @@ A mobile-first web app to run a shared wine tasting session: add wines, select o
 ## Project structure
 
 - `index.html`, `styles.css`, `app.js`: static frontend.
-- `backend/server.js`: Node/Express API for Airtable + session join.
+- `backend/worker.js`: Cloudflare Worker API for Airtable + session join.
 
 ## Run locally
 
 ```bash
 npm install
-npm run start
+npm run dev:worker
 ```
 
-Open `http://localhost:8787`.
+Wrangler will print a local Worker URL (typically `http://127.0.0.1:8787`).
 
 For frontend-only preview:
 ```bash
 python3 -m http.server 4173
 ```
-Then open `http://localhost:4173` (API calls won’t work without the backend).
+Then open `http://localhost:4173` (API calls won’t work without the Worker).
 
 ## Deploy
 
-You can deploy the **backend** to any Node host and serve the **frontend** either:
-- from the same backend (recommended), or
-- from static hosting (GitHub Pages, Netlify, etc.) and point to the backend URL.
+### Frontend (GitHub Pages)
 
-Minimal deployment steps:
-1. Deploy `backend/server.js` with Node 18+.
-2. Set environment variables (see Airtable section below).
-3. Ensure the backend can serve static files from the project root (already configured).
-4. Point your domain to the backend (or keep the frontend static and proxy API calls).
+1. GitHub repo → **Settings** → **Pages**.
+2. Source: `Deploy from a branch`, Branch: `main`, Folder: `/root`.
+3. Your site will be available at `https://<user>.github.io/<repo>/`.
+
+### Backend (Cloudflare Worker)
+
+This project includes a Cloudflare Worker in `backend/worker.js`.
+
+1. Install Wrangler:
+   ```bash
+   npm install
+   ```
+2. Login to Cloudflare:
+   ```bash
+   npx wrangler login
+   ```
+3. Set secrets:
+   ```bash
+   npx wrangler secret put AIRTABLE_BASE_ID
+   npx wrangler secret put AIRTABLE_TOKEN
+   ```
+4. Deploy:
+   ```bash
+   npm run deploy:worker
+   ```
+
+After deploy, Wrangler outputs your API URL (e.g. `https://taste-that-wine-api.<account>.workers.dev`).
+Set that URL in `index.html`:
+```html
+<script>
+  window.API_BASE = "https://taste-that-wine-api.gheger.workers.dev";
+</script>
+```
+
+If you rename or recreate the Worker later, update `window.API_BASE` and reset secrets:
+```bash
+npx wrangler secret put AIRTABLE_BASE_ID
+npx wrangler secret put AIRTABLE_TOKEN
+npm run deploy:worker
+```
 
 ## Airtable setup
 

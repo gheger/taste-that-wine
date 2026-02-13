@@ -7,6 +7,8 @@ const state = {
   participantName: "",
 };
 
+const API_BASE = window.API_BASE || "";
+
 const el = {
   menuToggle: document.getElementById("menuToggle"),
   drawer: document.getElementById("drawer"),
@@ -322,7 +324,9 @@ async function loadWines() {
       return;
     }
 
-    const response = await fetch(`/api/wines?session=${encodeURIComponent(state.sessionName)}`);
+    const response = await fetch(
+      `${API_BASE}/api/wines?session=${encodeURIComponent(state.sessionName)}`,
+    );
     if (!response.ok) throw new Error("wines api failed");
     const data = await response.json();
     state.wines = Array.isArray(data.records) ? data.records : [];
@@ -340,7 +344,9 @@ async function loadRatings() {
       return;
     }
 
-    const response = await fetch(`/api/ratings?session=${encodeURIComponent(state.sessionName)}`);
+    const response = await fetch(
+      `${API_BASE}/api/ratings?session=${encodeURIComponent(state.sessionName)}`,
+    );
     if (!response.ok) throw new Error("ratings api failed");
     const data = await response.json();
     state.ratings = Array.isArray(data.records) ? data.records : [];
@@ -383,7 +389,7 @@ el.lookupBtn?.addEventListener("click", async () => {
 
   el.wineStatus.textContent = "Recherche des infos sur la bouteille...";
   try {
-    const response = await fetch("/api/wines/lookup", {
+    const response = await fetch(`${API_BASE}/api/wines/lookup`, {
       method: "POST",
       body: form,
     });
@@ -439,7 +445,7 @@ el.addWineBtn.addEventListener("click", async () => {
   }
 
   try {
-    const response = await fetch("/api/wines", {
+    const response = await fetch(`${API_BASE}/api/wines`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(wine),
@@ -494,7 +500,7 @@ el.submitRatingBtn.addEventListener("click", async () => {
   };
 
   try {
-    const response = await fetch("/api/ratings", {
+    const response = await fetch(`${API_BASE}/api/ratings`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(rating),
@@ -577,7 +583,7 @@ el.joinSessionBtn.addEventListener("click", async () => {
 
   el.sessionStatus.textContent = "Connexion à la session...";
   try {
-    const response = await fetch("/api/sessions/join", {
+    const response = await fetch(`${API_BASE}/api/sessions/join`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, participant }),
@@ -607,7 +613,7 @@ el.joinSessionBtn.addEventListener("click", async () => {
 
   if (storedCode && storedParticipant) {
     el.sessionStatus.textContent = "Reconnexion à la session...";
-    fetch("/api/sessions/join", {
+    fetch(`${API_BASE}/api/sessions/join`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: storedCode, participant: storedParticipant }),
