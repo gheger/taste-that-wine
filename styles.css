@@ -372,6 +372,9 @@ button:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  hyphens: none;
 }
 
 .wine-cell {
@@ -385,6 +388,8 @@ button:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .wine-thumb {
@@ -529,6 +534,52 @@ button:hover {
 
 .modal-info {
   margin-top: 1.2rem;
+}
+
+.modal-action {
+  width: auto;
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+}
+
+.modal-notes {
+  margin-top: 0.6rem;
+  max-height: 220px;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.7rem;
+  padding-right: 0.2rem;
+}
+
+.note-quote {
+  margin: 0;
+  padding: 0.6rem 0.7rem;
+  border-radius: 12px;
+  background: #fdf7f1;
+  border: 1px solid var(--border);
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.note-author {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: #6b5b4c;
+  font-weight: 600;
+}
+
+.notes-count {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: #6b5b4c;
+  text-align: right;
 }
 
 .taste-mark {

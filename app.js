@@ -27,6 +27,7 @@ const el = {
   scoreLabel: document.getElementById("scoreLabel"),
   averageScore: document.getElementById("averageScore"),
   notes: document.getElementById("notes"),
+  notesCount: document.getElementById("notesCount"),
   submitRatingBtn: document.getElementById("submitRatingBtn"),
   ratingStatus: document.getElementById("ratingStatus"),
   wineTableBody: document.getElementById("wineTableBody"),
@@ -60,6 +61,8 @@ const el = {
   modalWineAverage: document.getElementById("modalWineAverage"),
   modalWineVotes: document.getElementById("modalWineVotes"),
   modalWineImage: document.getElementById("modalWineImage"),
+  modalOpenNotesBtn: document.getElementById("modalOpenNotesBtn"),
+  modalNotesList: document.getElementById("modalNotesList"),
 };
 
 function updateSelectedWineImage() {
@@ -198,6 +201,12 @@ function getNoteForWine(wineId) {
   return note ? note.notes : "";
 }
 
+function updateNotesCount() {
+  if (!el.notesCount) return;
+  const length = el.notes.value.length;
+  el.notesCount.textContent = `${length} / 200`;
+}
+
 function getScoreForWine(wineId) {
   const participantName = String(state.participantName || "").trim();
   const rating = state.ratings.find(
@@ -229,6 +238,12 @@ function updateAverageScore() {
   const avg = scores.reduce((sum, value) => sum + value, 0) / scores.length;
   const rounded = Math.round(avg);
   el.averageScore.textContent = `Moyenne : ${rounded}`;
+}
+
+function truncateNote(text, limit = 200) {
+  const value = String(text || "");
+  if (value.length <= limit) return value;
+  return `${value.slice(0, limit - 1)}…`;
 }
 
 const scoreLabels = {
@@ -309,26 +324,27 @@ async function saveRating() {
   }
 }
 
-function scheduleAutoSave() {
+function scheduleAutoSave(delay = 1200) {
   const key = getRatingKey();
   if (!key || key === lastSavedKey) return;
 
   if (autoSaveTimer) {
     clearTimeout(autoSaveTimer);
   }
-  el.ratingStatus.textContent = "Enregistrement...";
   autoSaveTimer = setTimeout(async () => {
     const nextKey = getRatingKey();
     if (!nextKey || nextKey === lastSavedKey) return;
+    el.ratingStatus.textContent = "Enregistrement...";
     await saveRating();
     lastSavedKey = nextKey;
-  }, 800);
+  }, delay);
 }
 
 function setSelectedWine(wineId) {
   state.selectedWineId = wineId;
   render();
   el.notes.value = wineId ? getNoteForWine(wineId) : "";
+  updateNotesCount();
   const existingScore = wineId ? getScoreForWine(wineId) : null;
   const nextScore = Number.isFinite(existingScore) ? normalizeScore(existingScore) : 50;
   el.score.value = String(nextScore);
@@ -362,6 +378,9 @@ function setSessionInfo({ name, code, participant }) {
 
 function openLeaderboardModal(entry) {
   if (!el.leaderboardModal) return;
+  if (el.modalOpenNotesBtn) {
+    el.modalOpenNotesBtn.dataset.wineId = entry.id;
+  }
   el.modalWineName.textContent = entry.name || "Vin inconnu";
   el.modalWineWinery.textContent = entry.winery ? `Domaine : ${entry.winery}` : "Domaine : N/D";
   el.modalWineVintage.textContent = entry.vintage
@@ -378,6 +397,33 @@ function openLeaderboardModal(entry) {
   } else {
     el.modalWineImage.removeAttribute("src");
     el.modalWineImage.style.display = "none";
+  }
+
+  if (el.modalNotesList) {
+    const notes = state.ratings
+      .filter(
+        (rating) =>
+          rating.wineId === entry.id && String(rating.notes || "").trim().length > 0,
+      )
+      .map((rating) => ({
+        author: String(rating.participant || "Anonyme").trim(),
+        text: truncateNote(String(rating.notes || "").trim(), 200),
+      }));
+
+    if (notes.length === 0) {
+      el.modalNotesList.innerHTML = `<p class="selected-wine-detail">Aucune note pour l’instant.</p>`;
+    } else {
+      el.modalNotesList.innerHTML = notes
+        .map(
+          (note) => `
+            <div class="note-quote">
+              ${note.text}
+              <p class="note-author">— ${note.author}</p>
+            </div>
+          `,
+        )
+        .join("");
+    }
   }
 
   el.leaderboardModal.classList.add("is-open");
@@ -563,6 +609,7 @@ async function loadRatings() {
   render();
   if (state.selectedWineId) {
     el.notes.value = getNoteForWine(state.selectedWineId);
+    updateNotesCount();
     const existingScore = getScoreForWine(state.selectedWineId);
     const nextScore = Number.isFinite(existingScore) ? normalizeScore(existingScore) : 50;
     el.score.value = String(nextScore);
@@ -688,6 +735,7 @@ el.participantName.addEventListener("input", () => {
   localStorage.setItem("ttw_participantName", state.participantName);
   if (state.selectedWineId) {
     el.notes.value = getNoteForWine(state.selectedWineId);
+    updateNotesCount();
     const existingScore = getScoreForWine(state.selectedWineId);
     const nextScore = Number.isFinite(existingScore) ? normalizeScore(existingScore) : 50;
     el.score.value = String(nextScore);
@@ -715,6 +763,14 @@ el.leaderboardModal?.addEventListener("click", (event) => {
   if (event.target === el.leaderboardModal) {
     closeLeaderboardModal();
   }
+});
+
+el.modalOpenNotesBtn?.addEventListener("click", () => {
+  const wineId = el.modalOpenNotesBtn.dataset.wineId || "";
+  if (!wineId) return;
+  closeLeaderboardModal();
+  setSelectedWine(wineId);
+  setActiveSection("notes");
 });
 
 document.addEventListener("keydown", (event) => {
@@ -746,8 +802,10 @@ function updateScoreDisplay() {
 }
 
 el.score.addEventListener("input", updateScoreDisplay);
-el.score.addEventListener("input", scheduleAutoSave);
-el.notes.addEventListener("input", scheduleAutoSave);
+el.score.addEventListener("input", () => scheduleAutoSave(500));
+el.notes.addEventListener("input", () => scheduleAutoSave(1500));
+el.notes.addEventListener("input", updateNotesCount);
+el.notes.addEventListener("blur", () => scheduleAutoSave(0));
 
 updateScoreDisplay();
 
