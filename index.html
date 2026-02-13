@@ -9,85 +9,113 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Open menu">
+      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Ouvrir le menu">
         <span class="menu-line"></span>
         <span class="menu-line"></span>
         <span class="menu-line"></span>
       </button>
       <div class="brand">
         <h1>Taste That Wine</h1>
-        <p class="subtitle">Capture bottles, add tasting notes, and score wines.</p>
+        <p class="subtitle">Ajoute ta quille dans la liste, trouve un verre et commence à déguster !</p>
       </div>
     </header>
 
     <nav id="drawer" class="drawer" aria-label="Main menu">
-      <button class="drawer-link active" type="button" data-nav="wine">Wine</button>
-      <button class="drawer-link" type="button" data-nav="notes">Tasting notes</button>
+      <button class="drawer-link active" type="button" data-nav="wine">Ajouter un vin</button>
+      <button class="drawer-link" type="button" data-nav="notes">Notes de dégustation</button>
+      <button id="resetSessionBtn" class="drawer-link reset-link" type="button">Nouvelle session</button>
     </nav>
 
     <main class="app">
       <section id="section-wine" class="section active" data-section="wine">
         <div class="card">
-          <h2>Wine</h2>
+          <h2>Vin</h2>
           <label>
-            Bottle photo
+            Photo de la bouteille
             <input id="bottlePhoto" type="file" accept="image/*" capture="environment" />
           </label>
-          <p class="helper">Photo will be saved as base64 in Airtable for this wine.</p>
-          <button id="lookupBtn" type="button">Try auto-fill from photo</button>
+          
 
           <div class="grid-two">
-            <label>Wine name <input id="wineName" type="text" placeholder="Chablis Premier Cru" /></label>
-            <label>Winery <input id="winery" type="text" placeholder="Domaine Example" /></label>
-            <label>Vintage <input id="vintage" type="text" placeholder="2021" /></label>
-            <label>Country <input id="country" type="text" placeholder="France" /></label>
+            <label>Nom du vin <input id="wineName" type="text" placeholder="Chablis Premier Cru" /></label>
+            <label>Domaine <input id="winery" type="text" placeholder="Domaine Exemple" /></label>
+            <label>Millésime <input id="vintage" type="text" placeholder="2021" /></label>
+            <label>Pays <input id="country" type="text" placeholder="France" /></label>
           </div>
 
-          <button id="addWineBtn" type="button">Add wine</button>
+          <button id="addWineBtn" type="button">Ajouter le vin</button>
           <p id="wineStatus" class="status"></p>
         </div>
       </section>
 
       <section id="section-notes" class="section" data-section="notes">
-        <div class="card">
-          <h2>Tasting notes</h2>
+        <p id="activeSession" class="helper"></p>
+        <div class="card" id="sessionCard">
+          <h2>Session</h2>
           <label>
-            Select wine
-            <select id="wineSelect">
-              <option value="">No wine yet</option>
-            </select>
+            Votre prénom
+            <input id="participantName" type="text" placeholder="Ex: Camille" />
           </label>
           <label>
-            Score (1 to 5)
-            <input id="score" type="number" min="1" max="5" value="3" />
+            Code de session
+            <input id="sessionCode" type="text" placeholder="Ex: P8K2" />
           </label>
-          <label>
-            Notes
-            <textarea id="notes" rows="4" placeholder="Aromas, palate, finish, pairing ideas..."></textarea>
-          </label>
-          <button id="submitRatingBtn" type="button">Save tasting notes</button>
-          <p id="ratingStatus" class="status"></p>
+          <button id="joinSessionBtn" type="button">Rejoindre une session</button>
+          <p id="sessionStatus" class="status"></p>
         </div>
-
         <div class="card">
-          <h3>Current wines</h3>
+          <h3>Vins en dégustation</h3>
           <div class="table-wrap">
             <table class="wine-table">
+              <colgroup>
+                <col style="width: 38%" />
+                <col style="width: 28%" />
+                <col style="width: 14%" />
+                <col style="width: 10%" />
+                <col style="width: 10%" />
+              </colgroup>
               <thead>
                 <tr>
-                  <th>Wine</th>
-                  <th>Winery</th>
-                  <th>Vintage</th>
-                  <th>Country</th>
-                  <th>Tasted</th>
+                  <th>Vin</th>
+                  <th>Domaine</th>
+                  <th>Millésime</th>
+                  <th>Pays</th>
+                  <th>Dégusté</th>
                 </tr>
               </thead>
               <tbody id="wineTableBody"></tbody>
             </table>
           </div>
         </div>
+
+        <div class="card" id="notesCard">
+          <h2>Notes de dégustation</h2>
+          <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+          <label>
+            <div class="score-header">
+              <span>Score (bouge le slider)</span>
+              <span id="averageScore" class="average-score">Moyenne : --</span>
+              <span id="scoreLabel" class="score-label"></span>
+            </div>
+            <div class="score-row">
+              <input id="score" type="range" min="10" max="100" step="10" value="50" />
+              <span id="scoreValue" class="score-value">50</span>
+            </div>
+          </label>
+          <label>
+            Notes
+            <textarea id="notes" rows="4" placeholder="Arômes, bouche, finale, idées d’accords..."></textarea>
+          </label>
+          <button id="submitRatingBtn" type="button">Enregistrer les notes de dégustation</button>
+          <p id="ratingStatus" class="status"></p>
+        </div>
       </section>
     </main>
+  </div>
+
+  <div id="imageLightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Aperçu de l'image">
+    <button id="lightboxClose" class="lightbox-close" type="button" aria-label="Fermer l'image">Fermer</button>
+    <img id="lightboxImage" class="lightbox-image" alt="Aperçu du vin" />
   </div>
 
   <script src="app.js" defer></script>

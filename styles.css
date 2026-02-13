@@ -98,6 +98,12 @@ body {
   border-color: transparent;
 }
 
+.reset-link {
+  background: #fff6f0;
+  color: var(--accent);
+  border-color: var(--border);
+}
+
 .drawer-open .drawer {
   display: grid;
 }
@@ -131,6 +137,16 @@ body {
   animation: rise 0.45s ease;
 }
 
+.card h2,
+.card h3 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
 .card:nth-child(2) {
   animation-delay: 0.08s;
 }
@@ -151,6 +167,121 @@ button {
   border: 1px solid #ccbfae;
   padding: 0.55rem 0.7rem;
   font-size: 1rem;
+}
+
+input[type="range"] {
+  min-height: 60px;
+  padding: 0.2rem 0.4rem;
+  background: transparent;
+  border: none;
+  accent-color: var(--accent);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    var(--accent) var(--range-fill, 50%),
+    #e8ddcf var(--range-fill, 50%),
+    #e8ddcf 100%
+  );
+  border: 1px solid var(--border);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--accent);
+  margin-top: -12px;
+  box-shadow: 0 6px 12px rgba(51, 30, 19, 0.22);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    var(--accent) var(--range-fill, 50%),
+    #e8ddcf var(--range-fill, 50%),
+    #e8ddcf 100%
+  );
+  border: 1px solid var(--border);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--accent);
+  box-shadow: 0 6px 12px rgba(51, 30, 19, 0.22);
+}
+
+input[type="range"]:focus-visible {
+  outline: 2px solid rgba(111, 29, 27, 0.3);
+  outline-offset: 4px;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.score-header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.score-header span:first-child {
+  text-align: left;
+}
+
+.score-header .score-label {
+  justify-self: end;
+}
+
+.average-score {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5f5f5f;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  background: #f7f1e8;
+  border: 1px solid var(--border);
+}
+
+.score-value {
+  min-width: 3ch;
+  padding: 0.35rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff8f0;
+  font-weight: 700;
+  text-align: center;
+}
+
+.score-label {
+  margin: 0;
+  padding: 0.35rem 0.6rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: #fff4ec;
+  border: 1px dashed rgba(111, 29, 27, 0.35);
+  text-align: right;
 }
 
 textarea {
@@ -202,6 +333,7 @@ button:hover {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
+  table-layout: fixed;
 }
 
 .wine-table th,
@@ -209,12 +341,22 @@ button:hover {
   padding: 0.65rem 0.5rem;
   border-bottom: 1px solid var(--border);
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .wine-cell {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+}
+
+.wine-cell span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .wine-thumb {
@@ -226,10 +368,69 @@ button:hover {
   background: #f6efe6;
 }
 
+.country-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.selected-wine-photo {
+  width: 100%;
+  max-height: 220px;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #f6efe6;
+  display: none;
+  margin: 0.4rem 0 0.8rem;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 15, 10, 0.86);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 50;
+}
+
+.lightbox.is-open {
+  display: flex;
+}
+
+.lightbox-image {
+  max-width: min(960px, 92vw);
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  border-radius: 16px;
+  object-fit: contain;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  background: #f6efe6;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: auto;
+  min-height: auto;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
 .taste-mark {
   text-align: center;
   font-weight: 700;
-  color: var(--accent);
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .wine-table tbody tr.untasted {
@@ -238,6 +439,10 @@ button:hover {
 
 .wine-table tbody tr.untasted .taste-mark {
   color: #8c7b6b;
+}
+
+.wine-table tbody tr.tasted .taste-mark {
+  color: #1f7a3b;
 }
 
 .wine-table tbody tr {

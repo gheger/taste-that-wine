@@ -1,30 +1,19 @@
 # Taste That Wine
 
-A mobile-first web app for wine tasting sessions.
+A mobile-first web app to run a shared wine tasting session: add wines, select one, and capture each taster’s score + notes.
 
-## What is implemented
+## What it does
 
-- Bottle photo capture from mobile camera.
-- Auto-fill attempt from photo via `POST /api/wines/lookup`.
-- Manual wine entry fallback (name, winery, vintage, country).
-- Session + participant setup.
-- Rating from 1 to 5 for each selected wine.
-- Backend endpoints ready to persist sessions/ratings in Airtable.
+- Join an existing tasting session with a **session code** and your **name**.
+- Add wines (photo + details) to the active session.
+- Score wines on a **10–100 stepped scale** with tasting labels.
+- Write/update ratings per **Session + Participant + Wine**.
+- Display a tasting table with per-participant “dégusté” status.
 
 ## Project structure
 
-- `index.html`, `styles.css`, `app.js`: static frontend (GitHub-deployable).
-- `backend/server.js`: minimal Node/Express backend API.
-
-## Do you need a backend?
-
-Yes - **recommended** for real usage.
-
-You can host frontend directly from GitHub Pages, but backend is needed to:
-- keep Airtable and lookup API keys private,
-- validate score values (1..5),
-- centralize writes to Airtable,
-- add caching/rate-limit later.
+- `index.html`, `styles.css`, `app.js`: static frontend.
+- `backend/server.js`: Node/Express API for Airtable + session join.
 
 ## Run locally
 
@@ -33,40 +22,80 @@ npm install
 npm run start
 ```
 
-Open `http://localhost:8787` if you serve frontend through the same server/proxy.
+Open `http://localhost:8787`.
 
-For quick frontend preview only:
+For frontend-only preview:
 ```bash
 python3 -m http.server 4173
 ```
-Then open `http://localhost:4173`.
+Then open `http://localhost:4173` (API calls won’t work without the backend).
 
+## Deploy
 
-### Troubleshooting (Windows)
-If `http://localhost:8787` shows `Cannot GET /`:
-1. Ensure you started the Node backend from the project root (the folder containing `index.html` and `package.json`).
-2. Pull the latest code (server now explicitly serves `index.html` on `/`).
-3. Restart the backend:
+You can deploy the **backend** to any Node host and serve the **frontend** either:
+- from the same backend (recommended), or
+- from static hosting (GitHub Pages, Netlify, etc.) and point to the backend URL.
 
-```bash
-npm run start
-```
+Minimal deployment steps:
+1. Deploy `backend/server.js` with Node 18+.
+2. Set environment variables (see Airtable section below).
+3. Ensure the backend can serve static files from the project root (already configured).
+4. Point your domain to the backend (or keep the frontend static and proxy API calls).
 
-## Airtable configuration
+## Airtable setup
 
-Set these environment variables before starting backend:
+Set these environment variables before starting the backend:
 
 - `AIRTABLE_BASE_ID`
 - `AIRTABLE_TOKEN`
 
-Backend writes:
-- `POST /api/sessions` -> `Sessions` table.
-- `POST /api/ratings` -> `Ratings` table.
+### Tables and fields (exact names)
 
-If env vars are missing, API still responds but skips Airtable write.
+**Sessions**
+- `Name` (text)
+- `Host` (text, optional)
+- `Code` (text, the session code users enter)
+- `Status` (text, use `active` for joinable sessions)
+- `Date` (datetime, optional)
 
-## Next steps
+**Wines**
+- `SessionName` (text)
+- `Name` (text)
+- `Winery` (text)
+- `Vintage` (text)
+- `Country` (text)
+- `Source` (text)
+- `ImageBase64` (long text)
 
-1. Replace demo lookup response in `/api/wines/lookup` with a real wine provider.
-2. Add table mapping from frontend wines to Airtable `Wines` table.
-3. Add authentication for private tasting sessions.
+**Ratings**
+- `SessionName` (text)
+- `Participant` (text)
+- `WineId` (text)
+- `Score` (number)
+- `Notes` (long text)
+
+### Notes
+
+- The frontend **does not create sessions**. Create them directly in Airtable by setting:
+  - `Code` (e.g., `GH40`)
+  - `Status` = `active`
+  - `Name` (e.g., `Default Session`)
+- A rating is **upserted**: if a rating exists for the same `SessionName + Participant + WineId`, it is updated.
+- If Airtable env vars are missing, the API responds but skips writes.
+
+## API endpoints (backend)
+
+- `POST /api/sessions/join` → validates a `code` and returns the session name.
+- `GET /api/wines?session=SessionName`
+- `GET /api/ratings?session=SessionName`
+- `POST /api/wines`
+- `POST /api/ratings`
+
+## Troubleshooting (Windows)
+
+If `http://localhost:8787` shows `Cannot GET /`:
+1. Start the backend from the project root (folder containing `index.html`).
+2. Restart the backend:
+   ```bash
+   npm run start
+   ```
