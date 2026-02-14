@@ -241,8 +241,8 @@ export default {
           );
         }
 
-        if (!Number.isInteger(score) || score < 1 || score > 100) {
-          return jsonResponse({ error: "score must be an integer from 1 to 100" }, 400);
+        if (!Number.isInteger(score) || score < 0 || score > 100) {
+          return jsonResponse({ error: "score must be an integer from 0 to 100" }, 400);
         }
 
         const existing = await findRatingRecord(env, {

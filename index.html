@@ -23,6 +23,7 @@
     <nav id="drawer" class="drawer" aria-label="Main menu">
       <button class="drawer-link active" type="button" data-nav="wine">Ajouter un vin</button>
       <button class="drawer-link" type="button" data-nav="notes">Notes de dégustation</button>
+      <button class="drawer-link" type="button" data-nav="favorites">Favoris</button>
       <button class="drawer-link" type="button" data-nav="leaderboard">Classement</button>
       <button id="resetSessionBtn" class="drawer-link reset-link" type="button">Nouvelle session</button>
     </nav>
@@ -30,7 +31,7 @@
     <main class="app">
       <section id="section-wine" class="section active" data-section="wine">
         <div class="card">
-          <h2>Vin</h2>
+          <h2>Ajouter un vin</h2>
           <label>
             Photo de la bouteille
             <input id="bottlePhoto" type="file" accept="image/*" capture="environment" />
@@ -92,26 +93,36 @@
         <button id="toLeaderboardBtn" class="section-cta" type="button">Voir le classement</button>
 
         <div class="card" id="notesCard">
-          <h2>Notes de dégustation</h2>
+          <div class="notes-header">
+            <h2>Notes de dégustation</h2>
+            <div class="favorite-row">
+              <span class="favorite-label">Coup de coeur</span>
+              <button id="favoriteBtn" class="favorite-btn" type="button" aria-label="Coup de coeur">
+                <span class="heart-icon" aria-hidden="true">♡</span>
+              </button>
+            </div>
+          </div>
           <div id="selectedWineInfo" class="selected-wine-info">
             <div class="selected-wine-meta">
               <p id="selectedWineName" class="selected-wine-name"></p>
-            <p id="selectedWineWinery" class="selected-wine-detail"></p>
-            <p id="selectedWineVintage" class="selected-wine-detail"></p>
-            <p id="selectedWineCountry" class="selected-wine-detail"></p>
-            <a id="selectedWineVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Chercher ce vin sur Vivino</a>
+              <p id="selectedWineWinery" class="selected-wine-detail"></p>
+              <p id="selectedWineVintage" class="selected-wine-detail"></p>
+              <p id="selectedWineCountry" class="selected-wine-detail"></p>
+              <a id="selectedWineVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Chercher ce vin sur Vivino</a>
+            </div>
+            <div class="wine-photo-wrap">
+              <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+            </div>
           </div>
-          <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
-        </div>
           <label>
             <div class="score-header">
-              <span>Score (déplace le curseur)</span>
+              <span>Score (0 à 100)</span>
               <span id="scoreLabel" class="score-label"></span>
               <span id="averageScore" class="average-score">Moyenne : --</span>
             </div>
             <div class="score-row">
               <div class="score-track">
-                <input id="score" type="range" min="10" max="100" step="10" value="50" />
+              <input id="score" type="range" min="0" max="100" step="10" value="50" />
                 <span id="scoreValue" class="score-bubble">50</span>
               </div>
             </div>
@@ -134,10 +145,11 @@
           <div class="table-wrap">
             <table class="wine-table">
               <colgroup>
-                <col style="width: 50%" />
+                <col style="width: 46%" />
                 <col style="width: 20%" />
-                <col style="width: 15%" />
-                <col style="width: 15%" />
+                <col style="width: 12%" />
+                <col style="width: 11%" />
+                <col style="width: 11%" />
               </colgroup>
               <thead>
                 <tr>
@@ -145,12 +157,37 @@
                   <th>Domaine</th>
                   <th>Moyenne</th>
                   <th>Votes</th>
+                  <th>♥</th>
                 </tr>
               </thead>
               <tbody id="leaderboardBody"></tbody>
             </table>
           </div>
           <p id="leaderboardStatus" class="status"></p>
+        </div>
+      </section>
+
+      <section id="section-favorites" class="section" data-section="favorites">
+        <div class="card">
+          <h2>Favoris</h2>
+          <div class="table-wrap">
+            <table class="wine-table">
+              <colgroup>
+                <col style="width: 50%" />
+                <col style="width: 30%" />
+                <col style="width: 20%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Vin</th>
+                  <th>Domaine</th>
+                  <th>Millésime</th>
+                </tr>
+              </thead>
+              <tbody id="favoritesBody"></tbody>
+            </table>
+          </div>
+          <p id="favoritesStatus" class="status"></p>
         </div>
       </section>
     </main>

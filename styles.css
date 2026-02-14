@@ -167,8 +167,15 @@ body {
 
 .card h2,
 .card h3 {
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   margin: 0;
+}
+
+.notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
 }
 
 .is-hidden {
@@ -297,6 +304,7 @@ input[type="range"]:focus-visible {
   font-weight: 700;
   text-align: center;
   box-shadow: 0 6px 16px rgba(51, 30, 19, 0.22);
+  pointer-events: none;
 }
 
 .score-bubble::after {
@@ -437,6 +445,50 @@ button:hover {
   background: #f6efe6;
   display: none;
   margin: 0;
+}
+
+.wine-photo-wrap {
+  position: relative;
+  width: fit-content;
+  justify-self: end;
+}
+
+.favorite-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  line-height: 1;
+  justify-content: flex-end;
+}
+
+.favorite-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.favorite-btn {
+  width: auto;
+  min-height: auto;
+  padding: 0.2rem 0.45rem;
+  border-radius: 10px;
+  background: #fff;
+  color: #b5a79a;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.favorite-btn.is-active {
+  color: #c0392b;
+  border-color: rgba(192, 57, 43, 0.4);
+}
+
+.heart-icon {
+  display: inline-block;
+  line-height: 1;
 }
 
 .selected-wine-info {

@@ -5,6 +5,7 @@ const state = {
   sessionName: "",
   sessionCode: "",
   participantName: "",
+  favorites: new Set(),
 };
 
 const API_BASE = window.API_BASE || "";
@@ -81,6 +82,7 @@ const el = {
   selectedWineVintage: document.getElementById("selectedWineVintage"),
   selectedWineCountry: document.getElementById("selectedWineCountry"),
   selectedWineVivinoLink: document.getElementById("selectedWineVivinoLink"),
+  favoriteBtn: document.getElementById("favoriteBtn"),
   participantName: document.getElementById("participantName"),
   sessionCode: document.getElementById("sessionCode"),
   joinSessionBtn: document.getElementById("joinSessionBtn"),
@@ -96,6 +98,8 @@ const el = {
   refreshLeaderboardBtn: document.getElementById("refreshLeaderboardBtn"),
   leaderboardBody: document.getElementById("leaderboardBody"),
   leaderboardStatus: document.getElementById("leaderboardStatus"),
+  favoritesBody: document.getElementById("favoritesBody"),
+  favoritesStatus: document.getElementById("favoritesStatus"),
   leaderboardModal: document.getElementById("leaderboardModal"),
   leaderboardModalClose: document.getElementById("leaderboardModalClose"),
   modalWineName: document.getElementById("modalWineName"),
@@ -152,10 +156,18 @@ function updateSelectedWineImage() {
       }
     }
     if (el.selectedWineVivinoLink) {
-      const query = `${wine.name || ""} ${wine.vintage || ""} ${wine.winery || ""}`.trim();
+      const query = `${wine.name || ""} ${wine.winery || ""}`.trim();
       el.selectedWineVivinoLink.href = query
         ? `https://www.vivino.com/search/wines?q=${encodeURIComponent(query)}`
         : "#";
+    }
+    if (el.favoriteBtn) {
+      el.favoriteBtn.dataset.wineId = wine.id;
+      el.favoriteBtn.classList.toggle("is-active", state.favorites.has(wine.id));
+      const heart = el.favoriteBtn.querySelector(".heart-icon");
+      if (heart) {
+        heart.textContent = state.favorites.has(wine.id) ? "♥" : "♡";
+      }
     }
   } else {
     if (el.selectedWineName) el.selectedWineName.textContent = "";
@@ -163,6 +175,14 @@ function updateSelectedWineImage() {
     if (el.selectedWineVintage) el.selectedWineVintage.textContent = "";
     if (el.selectedWineCountry) el.selectedWineCountry.textContent = "";
     if (el.selectedWineVivinoLink) el.selectedWineVivinoLink.href = "#";
+    if (el.favoriteBtn) {
+      el.favoriteBtn.dataset.wineId = "";
+      el.favoriteBtn.classList.remove("is-active");
+      const heart = el.favoriteBtn.querySelector(".heart-icon");
+      if (heart) {
+        heart.textContent = "♡";
+      }
+    }
   }
 }
 
@@ -188,6 +208,11 @@ function setActiveSection(section) {
     link.classList.toggle("active", link.dataset.nav === section);
   });
   document.body.classList.remove("drawer-open");
+  if (section === "notes") {
+    requestAnimationFrame(() => {
+      updateScoreDisplay();
+    });
+  }
 }
 
 function readFileAsDataUrl(file) {
@@ -312,7 +337,7 @@ const scoreLabels = {
   20: "Pour une sauce, allez",
   30: "Digne des meilleures gorons",
   40: "Correct sans plus",
-  50: "Pas mal du tout",
+  50: "Ça joue",
   60: "Bon",
   70: "Très bon",
   80: "Excellent",
@@ -321,7 +346,9 @@ const scoreLabels = {
 };
 
 function normalizeScore(value) {
-  const clamped = Math.min(100, Math.max(10, Number(value) || 50));
+  const numeric = Number(value);
+  const safe = Number.isFinite(numeric) ? numeric : 50;
+  const clamped = Math.min(100, Math.max(0, safe));
   return Math.round(clamped / 10) * 10;
 }
 
@@ -353,8 +380,8 @@ async function saveRating() {
     return;
   }
 
-  if (!Number.isInteger(score) || score < 1 || score > 100) {
-    el.ratingStatus.textContent = "La note doit être un entier de 1 à 100.";
+  if (!Number.isInteger(score) || score < 0 || score > 100) {
+    el.ratingStatus.textContent = "La note doit être un entier de 0 à 100.";
     return;
   }
 
@@ -429,7 +456,7 @@ function setSessionInfo({ name, code, participant }) {
   el.sessionCode.value = state.sessionCode;
   el.participantName.value = state.participantName;
   el.activeSession.textContent = state.sessionName
-    ? `Session active : ${state.sessionName} (code ${state.sessionCode})`
+    ? `Session en cours : ${state.sessionName} (code ${state.sessionCode})`
     : "";
   if (el.sessionCard) {
     el.sessionCard.classList.toggle("is-hidden", Boolean(state.sessionName));
@@ -442,7 +469,7 @@ function openLeaderboardModal(entry) {
     el.modalOpenNotesBtn.dataset.wineId = entry.id;
   }
   if (el.modalVivinoLink) {
-    const query = `${entry.name || ""} ${entry.vintage || ""} ${entry.winery || ""}`.trim();
+    const query = `${entry.name || ""} ${entry.winery || ""}`.trim();
     el.modalVivinoLink.href = query
       ? `https://www.vivino.com/search/wines?q=${encodeURIComponent(query)}`
       : "#";
@@ -474,6 +501,7 @@ function openLeaderboardModal(entry) {
       .map((rating) => ({
         author: String(rating.participant || "Anonyme").trim(),
         text: truncateNote(String(rating.notes || "").trim(), 200),
+        score: Number.isFinite(Number(rating.score)) ? Number(rating.score) : null,
       }));
 
     if (notes.length === 0) {
@@ -483,7 +511,7 @@ function openLeaderboardModal(entry) {
         .map(
           (note) => `
             <div class="note-quote">
-              ${note.text}
+              ${note.score !== null ? `(${note.score}) ` : ""}${note.text}
               <p class="note-author">— ${note.author}</p>
             </div>
           `,
@@ -519,6 +547,20 @@ function clearSessionInfo() {
   updateScoreDisplay();
   updateSelectedWineImage();
   render();
+}
+
+function loadFavorites() {
+  try {
+    const raw = localStorage.getItem("ttw_favorites");
+    const list = raw ? JSON.parse(raw) : [];
+    state.favorites = new Set(Array.isArray(list) ? list : []);
+  } catch {
+    state.favorites = new Set();
+  }
+}
+
+function saveFavorites() {
+  localStorage.setItem("ttw_favorites", JSON.stringify(Array.from(state.favorites)));
 }
 
 function buildLeaderboardRows() {
@@ -568,9 +610,41 @@ function buildLeaderboardRows() {
       <td>${row.winery}</td>
       <td>${row.avg ?? "—"}</td>
       <td>${row.votes}</td>
+      <td>${state.favorites.has(row.id) ? "1" : "0"}</td>
     `;
     tr.addEventListener("click", () => openLeaderboardModal(row));
     el.leaderboardBody.append(tr);
+  });
+}
+
+function buildFavoritesRows() {
+  if (!el.favoritesBody) return;
+  el.favoritesBody.innerHTML = "";
+
+  const favorites = state.wines.filter((wine) => state.favorites.has(wine.id));
+  if (favorites.length === 0) {
+    if (el.favoritesStatus) {
+      el.favoritesStatus.textContent = "Aucun favori pour l’instant.";
+    }
+    return;
+  }
+
+  if (el.favoritesStatus) {
+    el.favoritesStatus.textContent = "";
+  }
+
+  favorites.forEach((wine) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="wine-cell"><span>${wine.name || "Vin inconnu"}</span></td>
+      <td>${wine.winery || "Domaine inconnu"}</td>
+      <td>${wine.vintage || "N/D"}</td>
+    `;
+    tr.addEventListener("click", () => {
+      setSelectedWine(wine.id);
+      setActiveSection("notes");
+    });
+    el.favoritesBody.append(tr);
   });
 }
 
@@ -635,6 +709,7 @@ async function loadWines() {
   }
   render();
   buildLeaderboardRows();
+  buildFavoritesRows();
 }
 
 async function loadRatings() {
@@ -665,6 +740,7 @@ async function loadRatings() {
     updateAverageScore();
   }
   buildLeaderboardRows();
+  buildFavoritesRows();
 }
 
 el.menuToggle.addEventListener("click", () => {
@@ -799,6 +875,23 @@ el.selectedWineImage.addEventListener("click", () => {
   }
 });
 
+el.favoriteBtn?.addEventListener("click", () => {
+  const wineId = el.favoriteBtn.dataset.wineId || "";
+  if (!wineId) return;
+  if (state.favorites.has(wineId)) {
+    state.favorites.delete(wineId);
+  } else {
+    state.favorites.add(wineId);
+  }
+  saveFavorites();
+  el.favoriteBtn.classList.toggle("is-active", state.favorites.has(wineId));
+  const heart = el.favoriteBtn.querySelector(".heart-icon");
+  if (heart) {
+    heart.textContent = state.favorites.has(wineId) ? "♥" : "♡";
+  }
+  buildLeaderboardRows();
+  buildFavoritesRows();
+});
 
 el.lightboxClose.addEventListener("click", closeLightbox);
 el.imageLightbox.addEventListener("click", (event) => {
@@ -841,7 +934,7 @@ el.resetSessionBtn?.addEventListener("click", () => {
 function updateScoreDisplay() {
   const value = normalizeScore(el.score.value);
   el.score.value = String(value);
-  const min = Number(el.score.min) || 10;
+  const min = Number(el.score.min) || 0;
   const max = Number(el.score.max) || 100;
   const percent = ((value - min) / (max - min)) * 100;
   el.scoreValue.textContent = String(value);
@@ -852,7 +945,15 @@ function updateScoreDisplay() {
   el.score.style.setProperty("--range-fill", `${percent}%`);
   const track = el.score.parentElement;
   if (track) {
-    track.style.setProperty("--bubble-x", `${percent}%`);
+    const thumbSize = 34;
+    const width = el.score.getBoundingClientRect().width || 1;
+    const usable = Math.max(1, width - thumbSize);
+    const center = (percent / 100) * usable + thumbSize / 2;
+    const bubbleWidth = el.scoreValue.offsetWidth || 1;
+    const minX = bubbleWidth / 2;
+    const maxX = Math.max(minX, width - bubbleWidth / 2);
+    const clamped = Math.min(maxX, Math.max(minX, center));
+    track.style.setProperty("--bubble-x", `${clamped}px`);
     track.style.setProperty("--score-color", `hsl(${(percent * 120) / 100}, 65%, 35%)`);
   }
 }
@@ -896,6 +997,7 @@ el.joinSessionBtn.addEventListener("click", async () => {
 });
 
 (() => {
+  loadFavorites();
   const storedName = localStorage.getItem("ttw_sessionName") || "";
   const storedCode = localStorage.getItem("ttw_sessionCode") || "";
   const storedParticipant = localStorage.getItem("ttw_participantName") || "";
