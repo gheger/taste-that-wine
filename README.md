@@ -6,9 +6,11 @@ A mobile-first web app to run a shared wine tasting session: add wines, select o
 
 - Join an existing tasting session with a **session code** and your **name**.
 - Add wines (photo + details) to the active session.
-- Score wines on a **10–100 stepped scale** with tasting labels.
-- Write/update ratings per **Session + Participant + Wine**.
+- Score wines on a **0–100 stepped scale** with tasting labels.
+- Write/update ratings per **Session + Participant + Wine** (auto-save).
 - Display a tasting table with per-participant “dégusté” status.
+- Mark favorites (Coup de coeur) and view a favorites list.
+- Open Vivino search links from Notes and Classement.
 
 ## Project structure
 
