@@ -649,6 +649,21 @@ button:hover {
   text-align: left;
 }
 
+.join-conflict-card {
+  width: min(560px, 92vw);
+}
+
+.join-conflict-actions {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.join-conflict-actions .modal-action {
+  width: 100%;
+  margin-top: 0;
+  text-align: center;
+}
+
 .vivino-link {
   display: inline-block;
   margin-top: 0.4rem;

@@ -17,6 +17,14 @@ const normalizeCountry = (value) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
+const normalizeParticipantName = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+
 const countryFlags = {
   france: "🇫🇷",
   italie: "🇮🇹",
@@ -112,6 +120,9 @@ const el = {
   modalOpenNotesBtn: document.getElementById("modalOpenNotesBtn"),
   modalVivinoLink: document.getElementById("modalVivinoLink"),
   modalNotesList: document.getElementById("modalNotesList"),
+  joinNameConflictModal: document.getElementById("joinNameConflictModal"),
+  joinNameConflictConfirmBtn: document.getElementById("joinNameConflictConfirmBtn"),
+  joinNameConflictCancelBtn: document.getElementById("joinNameConflictCancelBtn"),
 };
 
 function updateSelectedWineImage() {
@@ -530,6 +541,65 @@ function closeLeaderboardModal() {
   el.leaderboardModal.setAttribute("aria-hidden", "true");
 }
 
+let joinConflictResolver = null;
+
+function resolveJoinConflict(choice) {
+  if (!el.joinNameConflictModal) return;
+  el.joinNameConflictModal.classList.remove("is-open");
+  el.joinNameConflictModal.setAttribute("aria-hidden", "true");
+  if (joinConflictResolver) {
+    joinConflictResolver(choice);
+    joinConflictResolver = null;
+  }
+}
+
+function openJoinConflictModal() {
+  if (
+    !el.joinNameConflictModal ||
+    !el.joinNameConflictConfirmBtn ||
+    !el.joinNameConflictCancelBtn
+  ) {
+    return Promise.resolve(
+      window.confirm(
+        "Il existe déjà un participant avec ce nom.\n\nOK: Oui, c'est moi, rejoindre la session\nAnnuler: Je vais choisi un autre prénom",
+      ),
+    );
+  }
+
+  el.joinNameConflictModal.classList.add("is-open");
+  el.joinNameConflictModal.setAttribute("aria-hidden", "false");
+  return new Promise((resolve) => {
+    joinConflictResolver = resolve;
+  });
+}
+
+async function participantNameExistsInSession(sessionName, participant) {
+  const normalizedName = normalizeParticipantName(participant);
+  if (!sessionName || !normalizedName) return false;
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/ratings?session=${encodeURIComponent(sessionName)}`,
+    );
+    if (!response.ok) return false;
+    const data = await response.json();
+    const records = Array.isArray(data.records) ? data.records : [];
+    return records.some(
+      (rating) => normalizeParticipantName(rating.participant) === normalizedName,
+    );
+  } catch {
+    return false;
+  }
+}
+
+function participantNameExistsInRatings(participant) {
+  const normalizedName = normalizeParticipantName(participant);
+  if (!normalizedName) return false;
+  return state.ratings.some(
+    (rating) => normalizeParticipantName(rating.participant) === normalizedName,
+  );
+}
+
 function clearSessionInfo() {
   state.sessionName = "";
   state.sessionCode = "";
@@ -915,10 +985,25 @@ el.modalOpenNotesBtn?.addEventListener("click", () => {
   setActiveSection("notes");
 });
 
+el.joinNameConflictConfirmBtn?.addEventListener("click", () => {
+  resolveJoinConflict("confirm");
+});
+
+el.joinNameConflictCancelBtn?.addEventListener("click", () => {
+  resolveJoinConflict("cancel");
+});
+
+el.joinNameConflictModal?.addEventListener("click", (event) => {
+  if (event.target === el.joinNameConflictModal) {
+    resolveJoinConflict("cancel");
+  }
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeLightbox();
     closeLeaderboardModal();
+    resolveJoinConflict("cancel");
   }
 });
 
@@ -988,6 +1073,20 @@ el.joinSessionBtn.addEventListener("click", async () => {
     setSessionInfo({ name: data.name, code, participant });
     await loadWines();
     await loadRatings();
+    const nameExists =
+      Boolean(data.participantExists) ||
+      participantNameExistsInRatings(participant) ||
+      (await participantNameExistsInSession(data.name, participant));
+    if (nameExists) {
+      const choice = await openJoinConflictModal();
+      if (choice !== "confirm" && choice !== true) {
+        clearSessionInfo();
+        el.sessionCode.value = code;
+        el.participantName.value = participant;
+        setActiveSection("wine");
+        return;
+      }
+    }
     el.sessionStatus.textContent = "Session rejointe.";
     buildLeaderboardRows();
   } catch (error) {
@@ -997,45 +1096,16 @@ el.joinSessionBtn.addEventListener("click", async () => {
 
 (() => {
   loadFavorites();
-  const storedName = localStorage.getItem("ttw_sessionName") || "";
   const storedCode = localStorage.getItem("ttw_sessionCode") || "";
   const storedParticipant = localStorage.getItem("ttw_participantName") || "";
-  if (storedName || storedCode || storedParticipant) {
+  if (storedCode || storedParticipant) {
     el.sessionCode.value = storedCode;
     el.participantName.value = storedParticipant;
   }
-
-  if (storedCode && storedParticipant) {
-    el.sessionStatus.textContent = "Reconnexion à la session...";
-    fetch(`${API_BASE}/api/sessions/join`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: storedCode, participant: storedParticipant }),
-    })
-      .then(async (response) => {
-        if (response.ok) return response.json();
-        const message = await readErrorMessage(response, "Session introuvable ou inactive.");
-        throw new Error(message);
-      })
-      .then(async (data) => {
-        if (data?.name) {
-          setSessionInfo({ name: data.name, code: storedCode, participant: storedParticipant });
-          loadWines();
-          loadRatings();
-          el.sessionStatus.textContent = "Session rejointe.";
-          buildLeaderboardRows();
-        } else {
-          clearSessionInfo();
-          el.sessionStatus.textContent = "Session introuvable ou inactive.";
-        }
-      })
-      .catch((error) => {
-        clearSessionInfo();
-        el.sessionStatus.textContent = error?.message || "Session introuvable ou inactive.";
-      });
-  } else if (el.sessionCard) {
+  if (el.sessionCard) {
     el.sessionCard.classList.remove("is-hidden");
   }
+  el.sessionStatus.textContent = "";
 })();
 
 loadWines();

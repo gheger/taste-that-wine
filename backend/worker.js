@@ -128,6 +128,18 @@ async function findRatingRecord(env, { sessionName, wineId, participant }) {
   return data.records?.[0] || null;
 }
 
+async function hasParticipantInSession(env, { sessionName, participant }) {
+  const normalizedSession = String(sessionName || "").trim();
+  const normalizedParticipant = String(participant || "").trim().toLowerCase();
+  if (!normalizedSession || !normalizedParticipant) return false;
+
+  const formula = `AND(TRIM({SessionName})='${escapeAirtableValue(
+    normalizedSession,
+  )}', LOWER(TRIM({Participant}))='${escapeAirtableValue(normalizedParticipant)}')`;
+  const data = await airtableList(env, "Ratings", { filterByFormula: formula, maxRecords: 1 });
+  return Boolean(data.records?.length);
+}
+
 async function parseJson(request) {
   try {
     return await request.json();
@@ -198,10 +210,17 @@ export default {
           return jsonResponse({ error: "session is not active" }, 410);
         }
 
+        const sessionName = String(record.fields?.Name || "").trim();
+        const participantExists = await hasParticipantInSession(env, {
+          sessionName,
+          participant,
+        });
+
         return jsonResponse({
           ok: true,
           code,
-          name: String(record.fields?.Name || "").trim(),
+          name: sessionName,
+          participantExists,
         });
       }
 

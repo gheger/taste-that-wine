@@ -120,7 +120,7 @@
             </div>
             <div class="score-row">
               <div class="score-track">
-                <input id="score" type="range" min="10" max="100" step="10" value="50" />
+                <input id="score" type="range" min="0" max="100" step="10" value="50" />
                 <span id="scoreValue" class="score-bubble">50</span>
               </div>
             </div>
@@ -217,6 +217,16 @@
           <div id="modalNotesList" class="modal-notes"></div>
         </div>
       </div>
+  </div>
+
+  <div id="joinNameConflictModal" class="modal" aria-hidden="true" role="dialog" aria-label="Conflit de prénom">
+    <div class="modal-card join-conflict-card">
+      <p id="joinNameConflictText" class="selected-wine-detail">Il existe déjà un participant avec ce nom</p>
+      <div class="join-conflict-actions">
+        <button id="joinNameConflictConfirmBtn" class="modal-action" type="button">Oui, c'est moi, rejoindre la session</button>
+        <button id="joinNameConflictCancelBtn" class="modal-action" type="button">Je vais choisi un autre prénom</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js" defer></script>
