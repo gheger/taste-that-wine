@@ -105,24 +105,22 @@
           <div id="selectedWineInfo" class="selected-wine-info">
             <div class="selected-wine-meta">
               <p id="selectedWineName" class="selected-wine-name"></p>
-              <p id="selectedWineWinery" class="selected-wine-detail"></p>
-              <p id="selectedWineVintage" class="selected-wine-detail"></p>
-              <p id="selectedWineCountry" class="selected-wine-detail"></p>
-              <a id="selectedWineVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Chercher ce vin sur Vivino</a>
-            </div>
-            <div class="wine-photo-wrap">
-              <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
-            </div>
+            <p id="selectedWineWinery" class="selected-wine-detail"></p>
+            <p id="selectedWineVintage" class="selected-wine-detail"></p>
+            <p id="selectedWineCountry" class="selected-wine-detail"></p>
+            <a id="selectedWineVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Rechercher ce vin sur Vivino</a>
           </div>
+          <img id="selectedWineImage" class="selected-wine-photo" alt="Photo du vin sélectionné" />
+        </div>
           <label>
             <div class="score-header">
-              <span>Score (0 à 100)</span>
+              <span>Score (déplace le curseur)</span>
               <span id="scoreLabel" class="score-label"></span>
               <span id="averageScore" class="average-score">Moyenne : --</span>
             </div>
             <div class="score-row">
               <div class="score-track">
-              <input id="score" type="range" min="0" max="100" step="10" value="50" />
+                <input id="score" type="range" min="10" max="100" step="10" value="50" />
                 <span id="scoreValue" class="score-bubble">50</span>
               </div>
             </div>
@@ -213,8 +211,8 @@
             <p id="modalWineCountry" class="selected-wine-detail"></p>
             <p id="modalWineAverage" class="selected-wine-detail"></p>
             <p id="modalWineVotes" class="selected-wine-detail"></p>
-            <a id="modalVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Chercher ce vin sur Vivino</a>
             <button id="modalOpenNotesBtn" class="modal-action" type="button">Noter ce vin</button>
+            <a id="modalVivinoLink" class="vivino-link" href="#" target="_blank" rel="noopener noreferrer">Rechercher ce vin sur Vivino</a>
           </div>
           <div id="modalNotesList" class="modal-notes"></div>
         </div>

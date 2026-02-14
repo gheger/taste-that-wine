@@ -915,7 +915,6 @@ el.modalOpenNotesBtn?.addEventListener("click", () => {
   setActiveSection("notes");
 });
 
-
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeLightbox();
@@ -987,9 +986,9 @@ el.joinSessionBtn.addEventListener("click", async () => {
     }
     const data = await response.json();
     setSessionInfo({ name: data.name, code, participant });
-    el.sessionStatus.textContent = "Session rejointe.";
     await loadWines();
     await loadRatings();
+    el.sessionStatus.textContent = "Session rejointe.";
     buildLeaderboardRows();
   } catch (error) {
     el.sessionStatus.textContent = error?.message || "Session introuvable ou inactive.";
@@ -1018,12 +1017,12 @@ el.joinSessionBtn.addEventListener("click", async () => {
         const message = await readErrorMessage(response, "Session introuvable ou inactive.");
         throw new Error(message);
       })
-      .then((data) => {
+      .then(async (data) => {
         if (data?.name) {
           setSessionInfo({ name: data.name, code: storedCode, participant: storedParticipant });
-          el.sessionStatus.textContent = "Session rejointe.";
           loadWines();
           loadRatings();
+          el.sessionStatus.textContent = "Session rejointe.";
           buildLeaderboardRows();
         } else {
           clearSessionInfo();
