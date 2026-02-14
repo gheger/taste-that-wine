@@ -467,7 +467,7 @@ function setSessionInfo({ name, code, participant }) {
   el.sessionCode.value = state.sessionCode;
   el.participantName.value = state.participantName;
   el.activeSession.textContent = state.sessionName
-    ? `Session en cours : ${state.sessionName} (code ${state.sessionCode})`
+    ? `Salut ${state.participantName} ! Session en cours : ${state.sessionName} (code ${state.sessionCode})`
     : "";
   if (el.sessionCard) {
     el.sessionCard.classList.toggle("is-hidden", Boolean(state.sessionName));
@@ -561,13 +561,16 @@ function openJoinConflictModal() {
   ) {
     return Promise.resolve(
       window.confirm(
-        "Il existe déjà un participant avec ce nom.\n\nOK: Oui, c'est moi, rejoindre la session\nAnnuler: Je vais choisi un autre prénom",
+        "Il existe déjà un participant avec ce nom.\n\nOK: Oui, c'est moi, rejoindre la session\nAnnuler: Je vais choisir un autre prénom",
       ),
     );
   }
 
   el.joinNameConflictModal.classList.add("is-open");
   el.joinNameConflictModal.setAttribute("aria-hidden", "false");
+  requestAnimationFrame(() => {
+    el.joinNameConflictConfirmBtn?.focus();
+  });
   return new Promise((resolve) => {
     joinConflictResolver = resolve;
   });
@@ -1053,6 +1056,13 @@ updateScoreDisplay();
 el.joinSessionBtn.addEventListener("click", async () => {
   const code = el.sessionCode.value.trim().toUpperCase();
   const participant = el.participantName.value.trim();
+  const storedCode = String(localStorage.getItem("ttw_sessionCode") || "")
+    .trim()
+    .toUpperCase();
+  const storedParticipant = String(localStorage.getItem("ttw_participantName") || "").trim();
+  const hasStoredSessionMatch =
+    storedCode === code &&
+    normalizeParticipantName(storedParticipant) === normalizeParticipantName(participant);
   if (!code || !participant) {
     el.sessionStatus.textContent = "Code de session et prénom requis.";
     return;
@@ -1077,13 +1087,13 @@ el.joinSessionBtn.addEventListener("click", async () => {
       Boolean(data.participantExists) ||
       participantNameExistsInRatings(participant) ||
       (await participantNameExistsInSession(data.name, participant));
-    if (nameExists) {
+    if (nameExists && !hasStoredSessionMatch) {
       const choice = await openJoinConflictModal();
       if (choice !== "confirm" && choice !== true) {
         clearSessionInfo();
         el.sessionCode.value = code;
         el.participantName.value = participant;
-        setActiveSection("wine");
+        setActiveSection("notes");
         return;
       }
     }
@@ -1102,10 +1112,40 @@ el.joinSessionBtn.addEventListener("click", async () => {
     el.sessionCode.value = storedCode;
     el.participantName.value = storedParticipant;
   }
-  if (el.sessionCard) {
-    el.sessionCard.classList.remove("is-hidden");
+  if (storedCode && storedParticipant) {
+    el.sessionStatus.textContent = "Reconnexion à la session...";
+    fetch(`${API_BASE}/api/sessions/join`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: storedCode, participant: storedParticipant }),
+    })
+      .then(async (response) => {
+        if (response.ok) return response.json();
+        const message = await readErrorMessage(response, "Session introuvable ou inactive.");
+        throw new Error(message);
+      })
+      .then(async (data) => {
+        if (data?.name) {
+          setSessionInfo({ name: data.name, code: storedCode, participant: storedParticipant });
+          await loadWines();
+          await loadRatings();
+          el.sessionStatus.textContent = "Session rejointe.";
+          buildLeaderboardRows();
+        } else {
+          clearSessionInfo();
+          el.sessionStatus.textContent = "Session introuvable ou inactive.";
+        }
+      })
+      .catch((error) => {
+        clearSessionInfo();
+        el.sessionStatus.textContent = error?.message || "Session introuvable ou inactive.";
+      });
+  } else {
+    if (el.sessionCard) {
+      el.sessionCard.classList.remove("is-hidden");
+    }
+    el.sessionStatus.textContent = "";
   }
-  el.sessionStatus.textContent = "";
 })();
 
 loadWines();

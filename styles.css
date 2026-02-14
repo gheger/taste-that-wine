@@ -651,6 +651,38 @@ button:hover {
 
 .join-conflict-card {
   width: min(560px, 92vw);
+  padding: 1.2rem;
+  border: 1px solid #d8c1ad;
+  background: linear-gradient(180deg, #fffdfa 0%, #fff8f0 100%);
+}
+
+.join-conflict-badge {
+  margin: 0 0 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(111, 29, 27, 0.1);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.join-conflict-title {
+  margin: 0;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.join-conflict-subtitle {
+  margin: 0.55rem 0 0.95rem;
+  color: #5f4f41;
+  font-size: 0.95rem;
+  line-height: 1.35;
 }
 
 .join-conflict-actions {
@@ -662,6 +694,29 @@ button:hover {
   width: 100%;
   margin-top: 0;
   text-align: center;
+  min-height: 46px;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.join-conflict-actions .modal-action:hover {
+  transform: translateY(-1px);
+}
+
+.join-conflict-confirm {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 18px rgba(111, 29, 27, 0.28);
+}
+
+.join-conflict-confirm:hover {
+  opacity: 0.95;
+}
+
+.join-conflict-cancel {
+  background: #fff;
+  color: var(--text);
+  border-color: #d8c1ad;
 }
 
 .vivino-link {

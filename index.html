@@ -221,10 +221,12 @@
 
   <div id="joinNameConflictModal" class="modal" aria-hidden="true" role="dialog" aria-label="Conflit de prénom">
     <div class="modal-card join-conflict-card">
-      <p id="joinNameConflictText" class="selected-wine-detail">Il existe déjà un participant avec ce nom</p>
+      <p class="join-conflict-badge">Conflit détecté</p>
+      <h3 class="join-conflict-title">Il existe déjà un participant avec ce nom</h3>
+      <p id="joinNameConflictText" class="join-conflict-subtitle">Souhaitez-vous confirmer votre identité ou choisir un autre prénom ?</p>
       <div class="join-conflict-actions">
-        <button id="joinNameConflictConfirmBtn" class="modal-action" type="button">Oui, c'est moi, rejoindre la session</button>
-        <button id="joinNameConflictCancelBtn" class="modal-action" type="button">Je vais choisi un autre prénom</button>
+        <button id="joinNameConflictConfirmBtn" class="modal-action join-conflict-confirm" type="button">Oui, c'est moi, rejoindre la session</button>
+        <button id="joinNameConflictCancelBtn" class="modal-action join-conflict-cancel" type="button">Je vais choisir un autre prénom</button>
       </div>
     </div>
   </div>
